@@ -9,7 +9,7 @@ using Sitecore.Mvc.Presentation;
 
 namespace Sv103.Feature.BasicContent
 {
-    public class DatasourceWithChildrenResolver: RenderingContentsResolver
+    public class DatasourceWithChildrenResolver : RenderingContentsResolver
     {
         public override object ResolveContents(Rendering rendering, IRenderingConfiguration renderingConfig)
         {
@@ -29,9 +29,28 @@ namespace Sv103.Feature.BasicContent
             if (itemList == null || itemList.Count == 0)
                 return jobject;
 
-            jobject["items"] = ProcessItems(itemList, rendering, renderingConfig);
+            jobject["items"] = ChildProcessItems(itemList, rendering, renderingConfig);
             return jobject;
+        }
 
+        private JArray ChildProcessItems(IEnumerable<Item> items, Rendering rendering, IRenderingConfiguration renderingConfig)
+        {
+            JArray jArray = new JArray();
+
+            foreach (var item in items)
+            {
+                JObject jobject = ProcessItem(item, rendering, renderingConfig);
+
+                IEnumerable<Item> children = GetItems(item);
+                if (children != null && children.Any())
+                {
+                    jobject["children"] = ChildProcessItems(children, rendering, renderingConfig);
+                }
+
+                jArray.Add(jobject);
+            }
+
+            return jArray;
         }
     }
 }
