@@ -1,0 +1,70 @@
+﻿@{
+    var datasourceId = RenderingContext.Current.Rendering.DataSource;
+    var item = Sitecore.Context.Database.GetItem(datasourceId);
+    var title = item.Fields["Title"].Value;
+    var description = item.Fields["Description"].Value;
+    var phone = item.Fields["Phone"].Value;
+    var password = item.Fields["Password"].Value;
+    var richtext = item.Fields["RichText"].Value;
+    var dropList = item.Fields["DropList"].Value;
+    var treeListField = (Sitecore.Data.Fields.MultilistField)item.Fields["TreeList"];
+    var selectedTreeListItems = treeListField.GetItems();
+
+    var checklistField = (Sitecore.Data.Fields.MultilistField)item.Fields["CheckList"];
+    var selectedItems = checklistField.GetItems();
+
+
+    string src = string.Empty;
+    Sitecore.Data.Fields.ImageField imageField = item.Fields["Image"];
+    if (imageField != null && imageField.MediaItem != null)
+    {
+        Sitecore.Data.Items.MediaItem image = new Sitecore.Data.Items.MediaItem(imageField.MediaItem);
+        src = Sitecore.StringUtil.EnsurePrefix('/',
+        Sitecore.Resources.Media.MediaManager.GetMediaUrl(image));
+        string imgTag = String.Format(@"<img src="" {0}"" alt="" {1}"" />", src, image.Alt);
+    }
+    var imageUrl = Sitecore.Resources.Media.MediaManager.GetMediaUrl(imageField.MediaItem);
+
+    string dateStr = item.Fields["CurrentDate"].Value;
+    DateTime date = DateTime.ParseExact(dateStr, "yyyyMMddTHHmmssZ", System.Globalization.CultureInfo.InvariantCulture);
+    string formattedDate = date.ToString("dd/MM/yyyy");
+}
+
+<div class="container mx-auto py-5 bg-white">
+    <div>
+        <h1 class="font-bold m-4 text-xl">Single Line Text: @title</h1>
+        <p class="m-2">Multi Line Text: @description</p>
+        <p class="m-2">Date: @formattedDate</p>
+        <p class="m-2">Number Field Type: @phone</p>
+        <p class="m-2">Image Field Type:</p>
+        <img src="@src" alt="@title" class="w-full md:w-64 md:h-64 rounded-lg" />
+        <p class="m-2">Password: @password</p>
+        <p class="mt-2 mb-4">Rich Text: @richtext</p>
+
+        ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        <div class="mt-4">
+            Selected DropList Value:
+            <p class="font-bold">@dropList</p>
+        </div>
+        <div class="mt-4">
+            Check List:
+            @{
+                foreach (var selectedItem in selectedItems)
+                {
+                    <p class="font-bold">@selectedItem["Name"]</p>
+                }
+            }
+        </div>
+        <div class="mt-4">
+            Selected TreeList Values:
+            @{
+                foreach (var selectedItem in selectedTreeListItems)
+                {
+                    <p class="font-bold">@selectedItem.Name</p>
+                }
+            }
+        </div>
+
+    </div>
+</div>

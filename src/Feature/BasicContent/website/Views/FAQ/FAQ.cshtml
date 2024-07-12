@@ -1,0 +1,41 @@
+﻿@{
+    var datasourceId = RenderingContext.Current.Rendering.DataSource;
+    var item = Sitecore.Context.Database.GetItem(datasourceId);
+    Sitecore.Data.Fields.MultilistField multiselectField = item.Fields["QuestionList"];
+    Sitecore.Data.Items.Item[] Faqs = multiselectField.GetItems();
+}
+<div class="container mx-auto py-5 bg-white">
+    <div class="font-bold">
+        <h1 class="font-bold text-center m-4 text-xl">@item.Fields["Heading"].Value</h1>
+        <p class="text-center m-4">@item.Fields["Description"].Value</p>
+        @if (Faqs != null && Faqs.Length > 0)
+        {
+
+            <div class="flex flex-wrap mx-4">
+                <div class="col-6 justify-center items-center">
+                    @foreach (var Question in Faqs)
+                    {
+                        <div class="w-full px-4 mb-5 shadow rounded m-2">
+                            <h6 class="font-bold text-xl">@Question.Fields["Question"].Value</h6>
+                        </div>
+                    }
+                    @{
+                        string src = string.Empty;
+                        Sitecore.Data.Fields.ImageField imageField = item.Fields["Image"];
+                        if (imageField != null && imageField.MediaItem != null)
+                        {
+                            Sitecore.Data.Items.MediaItem image = new Sitecore.Data.Items.MediaItem(imageField.MediaItem);
+                            src = Sitecore.StringUtil.EnsurePrefix('/',
+                            Sitecore.Resources.Media.MediaManager.GetMediaUrl(image));
+                            string imgTag = String.Format(@"<img src="" {0}"" alt="" {1}"" />", src, image.Alt);
+                        }
+                    }
+                </div>
+                <div class="col-6 justify-center items-center pl-5">
+                    <img src="@src" class="rounded-lg" width="300" height="300" />
+                </div>
+            </div>
+
+        }
+    </div>
+</div>

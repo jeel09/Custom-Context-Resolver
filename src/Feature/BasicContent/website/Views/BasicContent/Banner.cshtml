@@ -1,0 +1,36 @@
+﻿@{
+    var datasourceId = RenderingContext.Current.Rendering.DataSource;
+    var item = Sitecore.Context.Database.GetItem(datasourceId);
+    Sitecore.Data.Fields.MultilistField multiselectField = item.Fields["BannerList"];
+    Sitecore.Data.Items.Item[] Banneritems = multiselectField.GetItems();
+}
+<div class="container mx-auto py-5 bg-white">
+    <h1 class="font-bold text-3xl">
+        <h1>@item.Fields["Heading"].Value</h1>
+        @if (Banneritems != null && Banneritems.Length > 0)
+        {
+
+            <div class="flex flex-wrap mx-4">
+                @foreach (var Banneritem in Banneritems)
+                {
+                    string src = string.Empty;
+                    Sitecore.Data.Fields.ImageField imageField = Banneritem.Fields["Image"];
+                    if (imageField != null && imageField.MediaItem != null)
+                    {
+                        Sitecore.Data.Items.MediaItem image = new Sitecore.Data.Items.MediaItem(imageField.MediaItem);
+                        src = Sitecore.StringUtil.EnsurePrefix('/',
+                        Sitecore.Resources.Media.MediaManager.GetMediaUrl(image));
+                        string imgTag = String.Format(@"<img src="" {0}"" alt="" {1}"" />", src, image.Alt);
+                    }
+
+                    <div class="w-full md:w-1/3 px-4 mb-5 shadow rounded">
+                        <img src="@src" class="w-full" />
+                        <h6 class="font-bold text-xl">@Banneritem.Fields["Title"].Value</h6>
+                        @Html.Raw(Banneritem.Fields["Description"])
+                    </div>
+
+                }
+            </div>
+        }
+    </h1>
+</div>
