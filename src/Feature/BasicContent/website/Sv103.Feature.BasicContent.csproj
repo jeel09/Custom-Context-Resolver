@@ -44,11 +44,13 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNet.Mvc" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Cors" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
     <PackageReference Include="Newtonsoft.Json" />
     <PackageReference Include="Sitecore.Kernel" />
     <PackageReference Include="Sitecore.LayoutService" />
     <PackageReference Include="Sitecore.Mvc" />
+    <PackageReference Include="Sitecore.ContentSearch" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
@@ -59,8 +61,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\BasicContentController.cs" />
+    <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="DatasourceWithChildrenResolver.cs" />
+    <Compile Include="Models\SearchModel.cs" />
+    <Compile Include="Repository\SearchRepository.cs" />
     <Compile Include="Repository\BasicContentRepository.cs" />
+    <Compile Include="Repository\ISearchRepository.cs" />
     <Compile Include="Repository\IBasicContentRepository.cs" />
     <Compile Include="ServicesConfigurator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -94,6 +100,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Helper\" />
+    <Folder Include="Views\Search\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

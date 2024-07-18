@@ -11,6 +11,8 @@ namespace Sv103.Feature.BasicContent
         {
             serviceCollection.AddTransient<BasicContentController>();
             serviceCollection.AddTransient<IBasicContentRepository, BasicContentRepository>();
+            serviceCollection.AddTransient<SearchController>();
+            serviceCollection.AddTransient<ISearchRepository, SearchRepository>();
         }
     }
 }

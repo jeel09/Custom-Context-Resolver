@@ -41,5 +41,8 @@ namespace SVCommerce.Feature.BasicContent
                 public static readonly ID Content = new ID("{45EFE66E-5AD2-4F1D-BAD5-FDF281688681}");
             }
         }
+
+        //for solr search
+        public static readonly ID ParentId = new ID("e3f962c1a34d47f283ae1fd2bc247cad");
     }
 }

@@ -11,5 +11,7 @@
 	<PackageReference Update="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
 	<PackageReference Update="Newtonsoft.Json" Version="13.0.3" />
 	<PackageReference Update="Sitecore.LayoutService" Version="10.1.0" />
+	<PackageReference Update="Sitecore.ContentSearch" Version="10.4.0" />
+	<PackageReference Update="Microsoft.AspNet.WebApi.Cors" Version="5.3.0" />
   </ItemGroup>
 </Project>
