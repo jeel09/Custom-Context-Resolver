@@ -16,5 +16,14 @@ namespace Sv103.Feature.BasicContent.Models
 
         [IndexField("_parent")]
         public string ParentID { get; set; }
+
+        [IndexField("brand_t")]
+        public string Brand { get; set; }
+
+        [IndexField("productcategory_t")]
+        public string Category { get; set; }
+
+        [IndexField("price_tf")]
+        public float Price { get; set; }
     }
 }

@@ -10,6 +10,7 @@ using System.Web.Mvc;
 using Sv103.Feature.BasicContent.Models;
 using System.Web.Http.Cors;
 using Sv103.Feature.BasicContent.Repository;
+using Sitecore.ContentSearch.Linq;
 
 namespace Sv103.Feature.BasicContent.Controllers
 {
@@ -21,11 +22,43 @@ namespace Sv103.Feature.BasicContent.Controllers
             SearchRepository = searchRepository;
         }
 
-        public JsonResult SearchResult(string query)
+        public JsonResult SearchResult(string query, List<string> brands, List<string> categories)
         {
-            var searchResults = SearchRepository.SearchMethod(query);
+            var searchResults = SearchRepository.SearchMethod(query, brands, categories);
 
             return Json(searchResults, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetBrands()
+        {
+            var index = ContentSearchManager.GetIndex("sitecore_master_index");
+            using (var context = index.CreateSearchContext())
+            {
+                var query = context.GetQueryable<SearchModel>()
+                    .FacetOn(item => item.Brand)
+                    .Take(0);
+
+                var results = query.GetResults();
+                var facets = results.Facets;
+
+                return Json(facets, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public JsonResult GetCategories()
+        {
+            var index = ContentSearchManager.GetIndex("sitecore_master_index");
+            using (var context = index.CreateSearchContext())
+            {
+                var query = context.GetQueryable<SearchModel>()
+                    .FacetOn(item => item.Category)
+                    .Take(0);
+
+                var results = query.GetResults();
+                var facets = results.Facets;
+
+                return Json(facets, JsonRequestBehavior.AllowGet);
+            }
         }
     }
 }
