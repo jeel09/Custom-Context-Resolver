@@ -1,4 +1,5 @@
 ﻿using Sitecore.ContentSearch;
+using Sitecore.ContentSearch.Linq;
 using Sitecore.ContentSearch.Linq.Utilities;
 using Sv103.Feature.BasicContent.Models;
 using SVCommerce.Feature.BasicContent;
@@ -85,6 +86,32 @@ namespace Sv103.Feature.BasicContent.Repository
             }
 
             return predicate;
+        }
+
+        public object GetFacets()
+        {
+            var index = ContentSearchManager.GetIndex("sitecore_master_index");
+            using (var context = index.CreateSearchContext())
+            {
+                var brandQuery = context.GetQueryable<SearchModel>()
+                    .FacetOn(item => item.Brand)
+                    .Take(0);
+
+                var categoryQuery = context.GetQueryable<SearchModel>()
+                    .FacetOn(item => item.Category)
+                    .Take(0);
+
+                var brandResults = brandQuery.GetResults();
+                var categoryResults = categoryQuery.GetResults();
+
+                var combinedFacets = new
+                {
+                    Brands = brandResults.Facets,
+                    Categories = categoryResults.Facets
+                };
+
+                return combinedFacets;
+            }
         }
     }
 }

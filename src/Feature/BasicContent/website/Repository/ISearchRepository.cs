@@ -10,5 +10,6 @@ namespace Sv103.Feature.BasicContent.Repository
     {
         object SearchMethod(string searchTerm, List<string> brands, List<string> categories);
         Expression<Func<SearchModel, bool>> BuildSearchPredicate(string[] searchTerms, List<string> brands, List<string> categories);
+        object GetFacets();
     }
 }

@@ -26,34 +26,15 @@ namespace Sv103.Feature.BasicContent.Controllers
         {
             var searchResults = SearchRepository.SearchMethod(query, brands, categories);
 
-            var index = ContentSearchManager.GetIndex("sitecore_master_index");
-            using (var context = index.CreateSearchContext())
+            var combinedFacets = SearchRepository.GetFacets();
+
+            var combinedResults = new
             {
-                var brandQuery = context.GetQueryable<SearchModel>()
-                    .FacetOn(item => item.Brand)
-                    .Take(0);
+                SearchResults = searchResults,
+                Facets = combinedFacets
+            };
 
-                var categoryQuery = context.GetQueryable<SearchModel>()
-                    .FacetOn(item => item.Category)
-                    .Take(0);
-
-                var brandResults = brandQuery.GetResults();
-                var categoryResults = categoryQuery.GetResults();
-
-                var combinedFacets = new
-                {
-                    Brands = brandResults.Facets,
-                    Categories = categoryResults.Facets
-                };
-
-                var combinedResults = new
-                {
-                    SearchResults = searchResults,
-                    Facets = combinedFacets
-                };
-
-                return Json(combinedResults, JsonRequestBehavior.AllowGet);
-            }
+            return Json(combinedResults, JsonRequestBehavior.AllowGet);
         }
     }
 }
