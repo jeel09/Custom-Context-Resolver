@@ -22,15 +22,10 @@ namespace Sv103.Feature.BasicContent.Controllers
             SearchRepository = searchRepository;
         }
 
-        public JsonResult SearchResult(string query, List<string> brands, List<string> categories)
+        public JsonResult GetDataAndSearchResult(string query, List<string> brands, List<string> categories)
         {
             var searchResults = SearchRepository.SearchMethod(query, brands, categories);
 
-            return Json(searchResults, JsonRequestBehavior.AllowGet);
-        }
-
-        public JsonResult GetData()
-        {
             var index = ContentSearchManager.GetIndex("sitecore_master_index");
             using (var context = index.CreateSearchContext())
             {
@@ -51,9 +46,14 @@ namespace Sv103.Feature.BasicContent.Controllers
                     Categories = categoryResults.Facets
                 };
 
-                return Json(combinedFacets, JsonRequestBehavior.AllowGet);
+                var combinedResults = new
+                {
+                    SearchResults = searchResults,
+                    Facets = combinedFacets
+                };
+
+                return Json(combinedResults, JsonRequestBehavior.AllowGet);
             }
         }
-
     }
 }
