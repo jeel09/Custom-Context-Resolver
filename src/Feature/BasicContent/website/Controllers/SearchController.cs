@@ -29,36 +29,31 @@ namespace Sv103.Feature.BasicContent.Controllers
             return Json(searchResults, JsonRequestBehavior.AllowGet);
         }
 
-        public JsonResult GetBrands()
+        public JsonResult GetData()
         {
             var index = ContentSearchManager.GetIndex("sitecore_master_index");
             using (var context = index.CreateSearchContext())
             {
-                var query = context.GetQueryable<SearchModel>()
+                var brandQuery = context.GetQueryable<SearchModel>()
                     .FacetOn(item => item.Brand)
                     .Take(0);
 
-                var results = query.GetResults();
-                var facets = results.Facets;
-
-                return Json(facets, JsonRequestBehavior.AllowGet);
-            }
-        }
-
-        public JsonResult GetCategories()
-        {
-            var index = ContentSearchManager.GetIndex("sitecore_master_index");
-            using (var context = index.CreateSearchContext())
-            {
-                var query = context.GetQueryable<SearchModel>()
+                var categoryQuery = context.GetQueryable<SearchModel>()
                     .FacetOn(item => item.Category)
                     .Take(0);
 
-                var results = query.GetResults();
-                var facets = results.Facets;
+                var brandResults = brandQuery.GetResults();
+                var categoryResults = categoryQuery.GetResults();
 
-                return Json(facets, JsonRequestBehavior.AllowGet);
+                var combinedFacets = new
+                {
+                    Brands = brandResults.Facets,
+                    Categories = categoryResults.Facets
+                };
+
+                return Json(combinedFacets, JsonRequestBehavior.AllowGet);
             }
         }
+
     }
 }
