@@ -37,6 +37,7 @@ namespace Sv103.Feature.BasicContent.Repository
                 var results = context.GetQueryable<SearchModel>()
                     .Where(predicate)
                     .Where(item => item.ParentID == "e3f962c1a34d47f283ae1fd2bc247cad")
+                    .OrderBy(item => item.Title)
                     .Select(item => new
                     {
                         item.Title,
@@ -45,18 +46,10 @@ namespace Sv103.Feature.BasicContent.Repository
                         ProductCategory = item.Category,
                         item.Price
                     })
-                    .ToList()
-                    .OrderBy(item => ExtractNumber(item.Title))
-                    .ThenBy(item => item.Title);
+                    .ToList();
 
                 return results;
             }
-        }
-
-        private static int ExtractNumber(string title)
-        {
-            var match = System.Text.RegularExpressions.Regex.Match(title, @"\d+");
-            return match.Success ? int.Parse(match.Value) : 0;
         }
 
         public Expression<Func<SearchModel, bool>> BuildSearchPredicate(string[] searchTerms, List<string> brands, List<string> categories, float minPrice, float maxPrice)
