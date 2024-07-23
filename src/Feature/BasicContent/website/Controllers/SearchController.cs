@@ -22,9 +22,9 @@ namespace Sv103.Feature.BasicContent.Controllers
             SearchRepository = searchRepository;
         }
 
-        public JsonResult GetDataAndSearchResult(string query, List<string> brands, List<string> categories)
+        public JsonResult GetDataAndSearchResult(string query, List<string> brands, List<string> categories, int minPrice = 0, int maxPrice = 1000)
         {
-            var searchResults = SearchRepository.SearchMethod(query, brands, categories);
+            var searchResults = SearchRepository.SearchMethod(query, brands, categories, minPrice, maxPrice);
 
             var combinedFacets = SearchRepository.GetFacets();
 
@@ -35,6 +35,13 @@ namespace Sv103.Feature.BasicContent.Controllers
             };
 
             return Json(combinedResults, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetPriceFacets()
+        {
+            var priceRange = SearchRepository.GetPriceFacets();
+
+            return Json(priceRange, JsonRequestBehavior.AllowGet);
         }
     }
 }

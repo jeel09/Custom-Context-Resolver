@@ -2,12 +2,10 @@
 using Sitecore.ContentSearch.Linq;
 using Sitecore.ContentSearch.Linq.Utilities;
 using Sv103.Feature.BasicContent.Models;
-using SVCommerce.Feature.BasicContent;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Web.Mvc;
 
 namespace Sv103.Feature.BasicContent.Repository
 {
@@ -17,9 +15,13 @@ namespace Sv103.Feature.BasicContent.Repository
         {
         }
 
-        public object SearchMethod(string searchTerm, List<string> brands, List<string> categories)
+        public object SearchMethod(string searchTerm, List<string> brands, List<string> categories, float minPrice, float maxPrice)
         {
-            if(searchTerm == null && (brands == null || !brands.Any()) && (categories == null || !categories.Any()))
+            if (searchTerm == null && (brands == null || brands.Count == 0) && (categories == null || categories.Count == 0))
+            {
+                return null;
+            }
+            if (minPrice < 0 || maxPrice < 0 || minPrice > maxPrice)
             {
                 return null;
             }
@@ -28,9 +30,9 @@ namespace Sv103.Feature.BasicContent.Repository
 
             using (var context = index.CreateSearchContext())
             {
-                var searchTerms = searchTerm?.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries) ?? new string[0];
+                var searchTerms = searchTerm?.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
 
-                var predicate = BuildSearchPredicate(searchTerms, brands, categories);
+                var predicate = BuildSearchPredicate(searchTerms, brands, categories, minPrice, maxPrice);
 
                 var results = context.GetQueryable<SearchModel>()
                     .Where(predicate)
@@ -38,11 +40,11 @@ namespace Sv103.Feature.BasicContent.Repository
                     .OrderBy(item => item.Title)
                     .Select(item => new
                     {
-                        Title = item.Title,
-                        Description = item.Description,
-                        Brand = item.Brand,
+                        item.Title,
+                        item.Description,
+                        item.Brand,
                         ProductCategory = item.Category,
-                        Price = item.Price
+                        item.Price
                     })
                     .ToList();
 
@@ -50,19 +52,17 @@ namespace Sv103.Feature.BasicContent.Repository
             }
         }
 
-        public Expression<Func<SearchModel, bool>> BuildSearchPredicate(string[] searchTerms, List<string> brands, List<string> categories)
+        public Expression<Func<SearchModel, bool>> BuildSearchPredicate(string[] searchTerms, List<string> brands, List<string> categories, float minPrice, float maxPrice)
         {
             var predicate = PredicateBuilder.True<SearchModel>();
 
-            // Adding search terms to the predicate
             foreach (var term in searchTerms)
             {
                 var lowerTerm = term.ToLowerInvariant();
                 predicate = predicate.And(item => item.Title.Contains(lowerTerm) || item.Description.Contains(lowerTerm));
             }
 
-            // Adding brands to the predicate
-            if (brands != null && brands.Any())
+            if (brands?.Count > 0)
             {
                 var brandPredicate = PredicateBuilder.False<SearchModel>();
                 foreach (var brand in brands)
@@ -73,8 +73,7 @@ namespace Sv103.Feature.BasicContent.Repository
                 predicate = predicate.And(brandPredicate);
             }
 
-            // Adding categories to the predicate
-            if (categories != null && categories.Any())
+            if (categories?.Count > 0)
             {
                 var categoryPredicate = PredicateBuilder.False<SearchModel>();
                 foreach (var category in categories)
@@ -84,6 +83,7 @@ namespace Sv103.Feature.BasicContent.Repository
                 }
                 predicate = predicate.And(categoryPredicate);
             }
+            predicate = predicate.And(item => item.Price >= minPrice && item.Price <= maxPrice);
 
             return predicate;
         }
@@ -111,6 +111,29 @@ namespace Sv103.Feature.BasicContent.Repository
                 };
 
                 return combinedFacets;
+            }
+        }
+
+        public object GetPriceFacets()
+        {
+            var index = ContentSearchManager.GetIndex("sitecore_master_index");
+
+            using (var context = index.CreateSearchContext())
+            {
+                var results = context.GetQueryable<SearchModel>()
+                    .Where(item => item.ParentID == "e3f962c1a34d47f283ae1fd2bc247cad")
+                    .Select(item => item.Price)
+                    .ToList();
+
+                var minPrice = results.Min();
+                var maxPrice = results.Max();
+                var Range = new
+                {
+                    minPrice,
+                    maxPrice
+                };
+
+                return Range;
             }
         }
     }
