@@ -101,39 +101,26 @@ namespace Sv103.Feature.BasicContent.Repository
                     .FacetOn(item => item.Category)
                     .Take(0);
 
+                var priceQuery = context.GetQueryable<SearchModel>()
+                    .Where(item => item.ParentID == "e3f962c1a34d47f283ae1fd2bc247cad")
+                    .Select(item => item.Price)
+                    .ToList();
+
                 var brandResults = brandQuery.GetResults();
                 var categoryResults = categoryQuery.GetResults();
 
                 var combinedFacets = new
                 {
                     Brands = brandResults.Facets,
-                    Categories = categoryResults.Facets
+                    Categories = categoryResults.Facets,
+                    Price = new
+                    {
+                        minPrice = priceQuery.Min(),
+                        maxPrice = priceQuery.Max()
+                    }
                 };
 
                 return combinedFacets;
-            }
-        }
-
-        public object GetPriceFacets()
-        {
-            var index = ContentSearchManager.GetIndex("sitecore_master_index");
-
-            using (var context = index.CreateSearchContext())
-            {
-                var results = context.GetQueryable<SearchModel>()
-                    .Where(item => item.ParentID == "e3f962c1a34d47f283ae1fd2bc247cad")
-                    .Select(item => item.Price)
-                    .ToList();
-
-                var minPrice = results.Min();
-                var maxPrice = results.Max();
-                var Range = new
-                {
-                    minPrice,
-                    maxPrice
-                };
-
-                return Range;
             }
         }
     }

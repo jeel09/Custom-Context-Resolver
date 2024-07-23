@@ -36,12 +36,5 @@ namespace Sv103.Feature.BasicContent.Controllers
 
             return Json(combinedResults, JsonRequestBehavior.AllowGet);
         }
-
-        public JsonResult GetPriceFacets()
-        {
-            var priceRange = SearchRepository.GetPriceFacets();
-
-            return Json(priceRange, JsonRequestBehavior.AllowGet);
-        }
     }
 }
